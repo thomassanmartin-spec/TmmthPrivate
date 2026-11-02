@@ -26,12 +26,12 @@ def obtener_clima(ciudad):
                 "estado": datos["weather"][0]["description"]
             }
         elif respuesta.status_code == 404:
-            print("No encontré esa ciudad")
+            print("No la encontré")
             return None
         else:
             return None
     except requests.exceptions.ConnectionError:
-        print("No hay conexión, revisa tu internet")
+        print("Sin internet")
         return None
 
 
@@ -43,5 +43,5 @@ def obtener_moneda(moneda):
             return datos["serie"][0]["valor"]
         return None
     except requests.exceptions.ConnectionError:
-        print("No hay conexión, revisa tu internet")
+        print("Sin internet")
         return None
