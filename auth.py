@@ -8,13 +8,20 @@ ARCHIVO = "usuarios.json"
 def cargar_usuarios():
     if not os.path.exists(ARCHIVO):
         return {}
-    with open(ARCHIVO, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(ARCHIVO, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
 
 
 def guardar_usuarios(usuarios):
-    with open(ARCHIVO, "w", encoding="utf-8") as f:
-        json.dump(usuarios, f, indent=4)
+    try:
+        with open(ARCHIVO, "w", encoding="utf-8") as f:
+            json.dump(usuarios, f, indent=4)
+        return True
+    except OSError:
+        return False
 
 
 def registrar(usuario, clave):
@@ -23,12 +30,14 @@ def registrar(usuario, clave):
         return False
     hash_clave = bcrypt.hashpw(clave.encode(), bcrypt.gensalt())
     usuarios[usuario] = hash_clave.decode()
-    guardar_usuarios(usuarios)
-    return True
+    return guardar_usuarios(usuarios)
 
 
 def login(usuario, clave):
     usuarios = cargar_usuarios()
     if usuario not in usuarios:
         return False
-    return bcrypt.checkpw(clave.encode(), usuarios[usuario].encode())
+    try:
+        return bcrypt.checkpw(clave.encode(), usuarios[usuario].encode())
+    except ValueError:
+        return False
